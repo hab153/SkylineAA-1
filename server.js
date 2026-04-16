@@ -69,7 +69,7 @@ async function processJob(jobId, requestData) {
         if (planResult.data && planResult.data.status === 'needs_clarification') {
             jobs.set(jobId, {
                 status: 'needs_clarification',
-                 planResult.data,
+                data: planResult.data, // FIXED: Explicit key 'data'
                 completedAt: Date.now()
             });
             return;
@@ -130,7 +130,7 @@ async function processJob(jobId, requestData) {
             status: 'completed',
             result: {
                 success: true,
-                 {
+                data: { // FIXED: Explicit key 'data'
                     formattedOutput: formattedOutput,
                     files: finalFiles,
                     fileCount: Object.keys(finalFiles).length
@@ -273,7 +273,7 @@ const server = http.createServer(async (req, res) => {
             return sendJSON(res, 200, {
                 success: true,
                 status: 'needs_clarification',
-                 job.data
+                data: job.data // FIXED: Explicit key 'data'
             });
         } else {
             return sendJSON(res, 200, {
