@@ -389,15 +389,14 @@
         const clarificationContainer = document.getElementById('clarificationContainer');
         const questionsList = document.getElementById('questionsList');
 
-        // --- DYNAMIC API BASE CONFIGURATION ---
-        // 1. Check for environment variables (if built with Vite/Webpack)        // 2. Fallback to localhost for local development
-        const ENV_API_BASE = import.meta?.env?.VITE_API_BASE || process.env?.REACT_APP_API_BASE;
-        const API_BASE = ENV_API_BASE || 'http://localhost:5001';
-
+        // --- API BASE CONFIGURATION ---
+        // Leave empty '' for Relative Paths (Works on Localhost & Render)        // Or set to 'http://localhost:5001' for specific local testing
+        const API_BASE = ''; 
+        
         const BACKEND_URL = `${API_BASE}/api/plan/start`;
         const STATUS_URL = `${API_BASE}/api/plan/status`;
         const HEALTH_URL = `${API_BASE}/health`;
-        // --------------------------------------
+        // ------------------------------
         
         let currentResponseText = '';
         let conversationContext = null;
@@ -439,8 +438,8 @@
             toast.className = 'toast';
             toast.style.backgroundColor = isError ? '#f44336' : '#4caf50';
             toast.textContent = message;
-            document.body.appendChild(toast);            setTimeout(() => { toast.remove(); }, 2000);
-        }
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 2000);        }
 
         async function copyToClipboard(text) {
             try {
@@ -488,8 +487,8 @@
                     </div>
                     <div class="progress-bar-container">
                         <div class="progress-bar" style="width: ${progress}%"></div>
-                    </div>                    ${stepsHtml}
-                    <div style="font-size: 0.75rem; color: #888; margin-top: 5px;">
+                    </div>
+                    ${stepsHtml}                    <div style="font-size: 0.75rem; color: #888; margin-top: 5px;">
                         💡 No timeouts — job runs in background
                     </div>
                 </div>
@@ -524,7 +523,6 @@
                 }
                 
                 if (data.status === 'completed') {
-                    // Job finished successfully
                     clearInterval(pollInterval);
                     pollInterval = null;
                     displayResponse(data.result);
@@ -535,14 +533,12 @@
                     currentJobId = null;
                 } 
                 else if (data.status === 'failed') {
-                    // Job failed
                     clearInterval(pollInterval);
-                    pollInterval = null;                    displayError(data.error || 'Job failed unexpectedly');
+                    pollInterval = null;
+                    displayError(data.error || 'Job failed unexpectedly');
                     setLoading(false);
-                    currentJobId = null;
-                }
+                    currentJobId = null;                }
                 else if (data.status === 'needs_clarification') {
-                    // Need clarification
                     clearInterval(pollInterval);
                     pollInterval = null;
                     renderClarificationQuestions(data.data.questions);
@@ -551,7 +547,6 @@
                     currentJobId = null;
                 }
                 else {
-                    // Still processing - update progress
                     updateProgressDisplay({
                         progress: data.progress || 0,
                         currentStep: data.currentStep || 'Processing',
@@ -586,12 +581,12 @@
                 else if (data.data && data.data.status === 'needs_clarification') {
                     prettyOutput = JSON.stringify(data.data, null, 2);
                 }
-                else {                    try {
+                else {
+                    try {
                         prettyOutput = JSON.stringify(data, null, 2);
                     } catch (e) {
                         prettyOutput = String(data);
-                    }
-                }
+                    }                }
             } else {
                 prettyOutput = String(data);
             }
@@ -635,12 +630,12 @@
             mainInputGroup.style.display = 'none';
             clarificationContainer.style.display = 'flex';
             questionsList.innerHTML = '';
+
             questions.forEach((q, index) => {
                 const block = document.createElement('div');
                 block.className = 'question-block';                
                 const qText = document.createElement('div');
-                qText.className = 'question-text';
-                qText.textContent = `❓ ${q}`;
+                qText.className = 'question-text';                qText.textContent = `❓ ${q}`;
                 
                 const input = document.createElement('textarea');
                 input.className = 'answer-input';
@@ -684,12 +679,12 @@
                     connectionStatusDiv.innerHTML = '✅ Backend connected (job queue ready)';
                     sendButton.disabled = false;
                 } else {
-                    throw new Error('Server returned error');                }
+                    throw new Error('Server returned error');
+                }
             } catch (error) {
                 connectionStatusDiv.className = 'connection-status status-offline';
                 connectionStatusDiv.innerHTML = '❌ Backend offline — start server.js first';
-                sendButton.disabled = true;
-                if (!isProcessing) {
+                sendButton.disabled = true;                if (!isProcessing) {
                     responseDiv.innerHTML = `
                         <div class="error-message">
                             ⚠️ Cannot connect to backend server
@@ -733,12 +728,12 @@
                 try {
                     JSON.parse(rawInput);
                     payload = JSON.parse(rawInput);
-                } catch (e) {                    payload = { text: rawInput };
+                } catch (e) {
+                    payload = { text: rawInput };
                 }
             }
 
-            try {
-                // Start the job
+            try {                // Start the job
                 const response = await fetch(BACKEND_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -782,12 +777,12 @@
         copyResponseBtn.addEventListener('click', () => {
             if (currentResponseText) {
                 copyToClipboard(currentResponseText);
-            } else {                showToast('⚠️ No response to copy', true);
+            } else {
+                showToast('⚠️ No response to copy', true);
             }
         });
 
-        sendButton.addEventListener('click', onSendClick);
-        textarea.addEventListener('keydown', handleKeyboardShortcut);
+        sendButton.addEventListener('click', onSendClick);        textarea.addEventListener('keydown', handleKeyboardShortcut);
 
         const demoExample = `Build a login system with React and Node.js`;
         if (textarea.value.trim() === '') {
@@ -800,4 +795,4 @@
     })();
 </script>
 </body>
-  </html>
+    </html>
