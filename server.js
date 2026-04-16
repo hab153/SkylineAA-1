@@ -59,7 +59,7 @@ async function processJob(jobId, requestData) {
         if (planResult.data && planResult.data.status === 'needs_clarification') {
             jobs.set(jobId, {
                 status: 'needs_clarification',
-                 planResult.data,
+                data: planResult.data, // FIXED: Added key 'data'
                 completedAt: Date.now()
             });
             return;
@@ -120,7 +120,7 @@ async function processJob(jobId, requestData) {
             status: 'completed',
             result: {
                 success: true,
-                 {
+                data: { // FIXED: Added key 'data'
                     formattedOutput: formattedOutput,
                     files: finalFiles,
                     fileCount: Object.keys(finalFiles).length
@@ -217,7 +217,7 @@ app.get('/api/plan/status/:jobId', (req, res) => {
         return res.json({
             success: true,
             status: 'needs_clarification',
-             job.data
+            data: job.data // FIXED: Added key 'data'
         });
     } else {
         return res.json({
